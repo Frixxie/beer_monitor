@@ -1,0 +1,10 @@
+services:
+  beer_monitor:
+    build: .
+    env_file:
+      - path: ./.env
+        required: true
+
+networks:
+  hemrs: {}
+
