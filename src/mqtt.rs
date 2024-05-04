@@ -60,21 +60,14 @@ pub fn store_measurement(
     device_id: &DeviceId,
     sensor_ids: &SensorIds,
 ) -> Result<()> {
-    let ds18b20 = Measurement::new(
-        *device_id,
-        sensor_ids.ds18b20,
-        entry.ds18b20.temperature,
-    );
+    let ds18b20 = Measurement::new(*device_id, sensor_ids.ds18b20, entry.ds18b20.temperature);
     let dht11_temperature = Measurement::new(
         *device_id,
         sensor_ids.dht11_temperature,
         entry.dht11.temperature,
     );
-    let dht11_humidity = Measurement::new(
-        *device_id,
-        sensor_ids.dht11_humidity,
-        entry.dht11.humidity,
-    );
+    let dht11_humidity =
+        Measurement::new(*device_id, sensor_ids.dht11_humidity, entry.dht11.humidity);
     let dht11_dew_point = Measurement::new(
         *device_id,
         sensor_ids.dht11_dew_point,
@@ -98,8 +91,8 @@ pub fn handle_connection(
     for item in connection.iter() {
         match item {
             Ok(item) => match item {
-                Event::Incoming(inc) => match inc {
-                    Packet::Publish(p) => {
+                Event::Incoming(inc) => {
+                    if let Packet::Publish(p) = inc {
                         let payload = String::from_utf8(p.payload.to_vec())?;
                         info!("Got payload! {}", payload);
                         match serde_json::from_str::<SensorEntry>(&payload) {
@@ -109,7 +102,8 @@ pub fn handle_connection(
                                     &format!("{}/api/measurements", url),
                                     sensor,
                                     device_id,
-                                    sensor_ids,)
+                                    sensor_ids,
+                                )
                                 .unwrap();
                             }
                             Err(e) => {
@@ -117,8 +111,7 @@ pub fn handle_connection(
                             }
                         }
                     }
-                    _ => (),
-                },
+                }
                 Event::Outgoing(out) => {
                     debug!("Sending {:?}", out)
                 }
