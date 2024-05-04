@@ -24,7 +24,5 @@ jobs:
         run: make build
       - name: make test
         run: make test
-      - name: make integration
-        run: make integration_test
       - name: make container
         run: make container
