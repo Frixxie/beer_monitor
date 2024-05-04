@@ -61,22 +61,22 @@ pub fn store_measurement(
     sensor_ids: &SensorIds,
 ) -> Result<()> {
     let ds18b20 = Measurement::new(
-        device_id.clone(),
+        *device_id,
         sensor_ids.ds18b20,
         entry.ds18b20.temperature,
     );
     let dht11_temperature = Measurement::new(
-        device_id.clone(),
+        *device_id,
         sensor_ids.dht11_temperature,
         entry.dht11.temperature,
     );
     let dht11_humidity = Measurement::new(
-        device_id.clone(),
+        *device_id,
         sensor_ids.dht11_humidity,
         entry.dht11.humidity,
     );
     let dht11_dew_point = Measurement::new(
-        device_id.clone(),
+        *device_id,
         sensor_ids.dht11_dew_point,
         entry.dht11.dew_point,
     );
@@ -105,11 +105,11 @@ pub fn handle_connection(
                         match serde_json::from_str::<SensorEntry>(&payload) {
                             Ok(sensor) => {
                                 store_measurement(
-                                    &http_client,
+                                    http_client,
                                     &format!("{}/api/measurements", url),
                                     sensor,
-                                    &device_id,
-                                    &sensor_ids,)
+                                    device_id,
+                                    sensor_ids,)
                                 .unwrap();
                             }
                             Err(e) => {

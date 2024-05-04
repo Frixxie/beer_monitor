@@ -58,16 +58,16 @@ fn setup_sensor(
             };
             let response = client.post(url).json(&new_device).send()?;
             println!("{:?}", response);
-            setup_sensor(&client, url, sensor_name, sensor_unit)
+            setup_sensor(client, url, sensor_name, sensor_unit)
         }
     }
 }
 
 pub fn setup_sensors(client: &reqwest::blocking::Client, url: &str) -> Result<SensorIds> {
-    let ds18b20 = setup_sensor(&client, url, "DS18B20", "°C")?;
-    let dht11_temperature = setup_sensor(&client, url, "DHT11 Temperature", "°C")?;
-    let dht11_humidity = setup_sensor(&client, url, "DHT11 Humidity", "%")?;
-    let dht11_dew_point = setup_sensor(&client, url, "DHT11 Dew Point", "°C")?;
+    let ds18b20 = setup_sensor(client, url, "DS18B20", "°C")?;
+    let dht11_temperature = setup_sensor(client, url, "DHT11 Temperature", "°C")?;
+    let dht11_humidity = setup_sensor(client, url, "DHT11 Humidity", "%")?;
+    let dht11_dew_point = setup_sensor(client, url, "DHT11 Dew Point", "°C")?;
 
     Ok(SensorIds {
         ds18b20,
@@ -100,7 +100,7 @@ pub fn setup_device(
             };
             let response = client.post(url).json(&new_device).send()?;
             println!("{:?}", response);
-            setup_device(&client, url, device_name, device_location)
+            setup_device(client, url, device_name, device_location)
         }
     }
 }
