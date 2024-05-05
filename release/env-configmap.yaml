@@ -9,4 +9,4 @@ kind: ConfigMap
 metadata:
   labels:
     io.kompose.service: beer-monitor-env
-  name: env
+  name: env-beer-monitor
