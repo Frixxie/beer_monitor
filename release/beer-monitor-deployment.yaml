@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.32.0 (HEAD)
+  labels:
+    io.kompose.service: beer-monitor
+  name: beer-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: beer-monitor
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.32.0 (HEAD)
+      labels:
+        io.kompose.network/beer-monitor-default: "true"
+        io.kompose.service: beer-monitor
+    spec:
+      containers:
+        - env:
+            - name: DEVICE_LOCATION
+              valueFrom:
+                configMapKeyRef:
+                  key: DEVICE_LOCATION
+                  name: env
+            - name: DEVICE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: DEVICE_NAME
+                  name: env
+            - name: HEMRS_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: HEMRS_BASE_URL
+                  name: env
+            - name: MQTT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: MQTT_HOST
+                  name: env
+            - name: TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  key: TOPIC
+                  name: env
+          image: ghcr.io/frixxie/beer-monitor:0.1.0 # {"$imagepolicy": "flux-system:beer-monitor-policy"}
+          name: beer-monitor
+      restartPolicy: Always

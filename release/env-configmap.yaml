@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  DEVICE_LOCATION: Cellar
+  DEVICE_NAME: Beer
+  HEMRS_BASE_URL: http://hemrs
+  MQTT_HOST: server
+  TOPIC: tele/beer/SENSOR
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: beer-monitor-env
+  name: env
