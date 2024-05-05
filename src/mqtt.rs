@@ -110,15 +110,16 @@ pub fn handle_connection(
                                 warn!("Error = {:?}", e);
                             }
                         }
+                    } else {
+                        info!("Got packet {:?}", inc)
                     }
                 }
                 Event::Outgoing(out) => {
-                    debug!("Sending {:?}", out)
+                    info!("Sending {:?}", out)
                 }
             },
             Err(e) => {
                 warn!("Error = {:?}", e);
-                continue;
             }
         }
     }
