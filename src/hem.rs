@@ -1,4 +1,5 @@
 use anyhow::Result;
+use log::info;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -47,7 +48,7 @@ fn setup_sensor(
     let device = sensors.iter().find(|d| d.name == sensor_name);
     match device {
         Some(d) => {
-            println!("{:?}", d);
+            info!("{:?}", d);
             Ok(d.id)
         }
         None => {
@@ -57,7 +58,7 @@ fn setup_sensor(
                 unit: sensor_unit.to_string(),
             };
             let response = client.post(url).json(&new_device).send()?;
-            println!("{:?}", response);
+            info!("{:?}", response);
             setup_sensor(client, url, sensor_name, sensor_unit)
         }
     }
@@ -89,7 +90,7 @@ pub fn setup_device(
         .find(|d| d.name == device_name && d.location == device_location);
     match device {
         Some(d) => {
-            println!("{:?}", d);
+            info!("{:?}", d);
             Ok(d.id)
         }
         None => {
@@ -99,7 +100,7 @@ pub fn setup_device(
                 location: device_location.to_string(),
             };
             let response = client.post(url).json(&new_device).send()?;
-            println!("{:?}", response);
+            info!("{:?}", response);
             setup_device(client, url, device_name, device_location)
         }
     }

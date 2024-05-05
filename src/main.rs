@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{fmt::Display, time::Duration};
 
 use anyhow::Result;
 
@@ -15,7 +15,7 @@ use crate::{
 mod hem;
 mod mqtt;
 
-#[derive(StructOpt)]
+#[derive(StructOpt, Debug)]
 pub struct Opts {
     #[structopt(short, long, env, default_value = "server")]
     pub mqtt_host: String,
@@ -23,7 +23,7 @@ pub struct Opts {
     #[structopt(short, long, env, default_value = "tele/beer/SENSOR")]
     pub topic: String,
 
-    #[structopt(short, long, env, default_value = "http://localhost:65534")]
+    #[structopt(short, long, env, default_value = "http://thor:65534")]
     pub hemrs_base_url: String,
 
     #[structopt(short, long, env, default_value = "Beer")]
@@ -31,6 +31,19 @@ pub struct Opts {
 
     #[structopt(short = "l", long, env, default_value = "Celar")]
     pub device_location: String,
+
+    #[structopt(short, long, env, default_value = "k8s")]
+    pub clientid: String,
+}
+
+impl Display for Opts {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "mqtt_host: {}, topic: {}, hemrs_base_url: {}, device_name: {}, device_location: {}, clientid: {}",
+            self.mqtt_host, self.topic, self.hemrs_base_url, self.device_name, self.device_location, self.clientid
+        )
+    }
 }
 
 fn main() -> Result<()> {
@@ -38,6 +51,8 @@ fn main() -> Result<()> {
     SimpleLogger::new()
         .with_level(log::LevelFilter::Info)
         .init()?;
+
+    info!("{}", opts);
 
     let http_client = reqwest::blocking::Client::new();
 
@@ -57,7 +72,11 @@ fn main() -> Result<()> {
 
     info!("{:?}", sensor_ids);
 
-    let mut mqttoptions = MqttOptions::new("beer_collector", opts.mqtt_host, 1883);
+    let mut mqttoptions = MqttOptions::new(
+        format!("beer_monitor_{}", opts.clientid),
+        opts.mqtt_host,
+        1883,
+    );
     mqttoptions.set_keep_alive(Duration::from_secs(5));
 
     let (client, connection) = Client::new(mqttoptions, 10);
