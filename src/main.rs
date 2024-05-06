@@ -31,17 +31,14 @@ pub struct Opts {
 
     #[structopt(short = "l", long, env, default_value = "Celar")]
     pub device_location: String,
-
-    #[structopt(short, long, env, default_value = "k8s")]
-    pub clientid: String,
 }
 
 impl Display for Opts {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "mqtt_host: {}, topic: {}, hemrs_base_url: {}, device_name: {}, device_location: {}, clientid: {}",
-            self.mqtt_host, self.topic, self.hemrs_base_url, self.device_name, self.device_location, self.clientid
+            "mqtt_host: {}, topic: {}, hemrs_base_url: {}, device_name: {}, device_location: {}",
+            self.mqtt_host, self.topic, self.hemrs_base_url, self.device_name, self.device_location
         )
     }
 }
@@ -73,7 +70,10 @@ fn main() -> Result<()> {
     info!("{:?}", sensor_ids);
 
     let mut mqttoptions = MqttOptions::new(
-        format!("beer_monitor_{}", opts.clientid),
+        format!(
+            "beer_monitor_{}",
+            gethostname::gethostname().to_str().unwrap()
+        ),
         opts.mqtt_host,
         1883,
     );

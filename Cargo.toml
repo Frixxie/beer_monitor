@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.82"
 chrono = { version = "0.4.38", features = ["serde"] }
+gethostname = "0.4.3"
 log = "0.4.21"
 reqwest = { version = "0.12.4", features = ["blocking", "json"] }
 rumqttc = "0.24.0"
