@@ -1,6 +1,6 @@
-use anyhow::Result;
+use anyhow::{Error, Result};
 use chrono::NaiveDateTime;
-use log::{debug, info, warn};
+use log::{info, warn};
 use reqwest::blocking::Client;
 use rumqttc::{Connection, Event, Packet};
 use serde::{Deserialize, Serialize};
@@ -81,6 +81,38 @@ pub fn store_measurement(
     Ok(())
 }
 
+pub fn handle_incomming(
+    inc: Packet,
+    http_client: &Client,
+    device_id: &DeviceId,
+    sensor_ids: &SensorIds,
+    url: &str,
+) -> Result<()> {
+    if let Packet::Publish(p) = inc {
+        let payload = String::from_utf8(p.payload.to_vec())?;
+        info!("Got payload! {}", payload);
+        match serde_json::from_str::<SensorEntry>(&payload) {
+            Ok(sensor) => {
+                store_measurement(
+                    http_client,
+                    &format!("{}/api/measurements", url),
+                    sensor,
+                    device_id,
+                    sensor_ids,
+                )?;
+                Ok(())
+            }
+            Err(e) => {
+                warn!("Error = {:?}", e);
+                Err(Error::new(e))
+            }
+        }
+    } else {
+        info!("Got packet {:?}", inc);
+        Ok(())
+    }
+}
+
 pub fn handle_connection(
     mut connection: Connection,
     http_client: &Client,
@@ -92,27 +124,7 @@ pub fn handle_connection(
         match item {
             Ok(item) => match item {
                 Event::Incoming(inc) => {
-                    if let Packet::Publish(p) = inc {
-                        let payload = String::from_utf8(p.payload.to_vec())?;
-                        info!("Got payload! {}", payload);
-                        match serde_json::from_str::<SensorEntry>(&payload) {
-                            Ok(sensor) => {
-                                store_measurement(
-                                    http_client,
-                                    &format!("{}/api/measurements", url),
-                                    sensor,
-                                    device_id,
-                                    sensor_ids,
-                                )
-                                .unwrap();
-                            }
-                            Err(e) => {
-                                warn!("Error = {:?}", e);
-                            }
-                        }
-                    } else {
-                        info!("Got packet {:?}", inc)
-                    }
+                    handle_incomming(inc, http_client, device_id, sensor_ids, url)?
                 }
                 Event::Outgoing(out) => {
                     info!("Sending {:?}", out)
