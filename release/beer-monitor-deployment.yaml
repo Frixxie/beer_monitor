@@ -48,6 +48,6 @@ spec:
                 configMapKeyRef:
                   key: TOPIC
                   name: env-beer-monitor
-          image: ghcr.io/frixxie/beer_monitor:0.1.5 # {"$imagepolicy": "flux-system:beer-monitor-policy"}
+          image: ghcr.io/frixxie/beer_monitor:0.1.6 # {"$imagepolicy": "flux-system:beer-monitor-policy"}
           name: beer-monitor
       restartPolicy: Always
